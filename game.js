@@ -101,8 +101,15 @@ class Ball {
     }
     
     reset() {
-        this.x = canvas.width / 2;
-        this.y = 100;
+        // Start ball on either player's side
+        const side = Math.random() < 0.5 ? 'left' : 'right';
+        if (side === 'left') {
+            this.x = canvas.width * 0.25; // Left side
+        } else {
+            this.x = canvas.width * 0.75; // Right side
+        }
+        
+        this.y = 50; // Higher drop
         this.radius = 15;
         this.velocityX = (Math.random() - 0.5) * 0.1;
         this.velocityY = 0;
@@ -125,16 +132,16 @@ class Ball {
         this.y += this.velocityY;
         
         if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
-            this.velocityX = -this.velocityX * 0.5;
+            this.velocityX = -this.velocityX * 0.8; // More bouncy walls
             this.x = this.x - this.radius < 0 ? this.radius : canvas.width - this.radius;
         }
         
         if (this.y + this.radius > GROUND_Y) {
-            this.velocityY = -this.velocityY * 0.4;
+            this.velocityY = -this.velocityY * 0.7; // Much more bouncy ground
             this.y = GROUND_Y - this.radius;
-            this.velocityX *= 0.8;
+            this.velocityX *= 0.9; // Less friction on ground
             
-            if (Math.abs(this.velocityY) < 1) {
+            if (Math.abs(this.velocityY) < 0.05) { // Lower threshold for stopping
                 this.velocityY = 0;
             }
         }
@@ -164,16 +171,16 @@ class Ball {
             const ax = targetX - this.x;
             const ay = targetY - this.y;
             
-            // Ultra gentle collision for 60fps
-            this.velocityX = Math.cos(angle) * 0.3;
-            this.velocityY = Math.sin(angle) * 0.3 - 0.1;
+            // More responsive collision for better gameplay
+            this.velocityX = Math.cos(angle) * 0.4;
+            this.velocityY = Math.sin(angle) * 0.4 - 0.15;
             
-            // Very minimal slime influence
-            if (Math.abs(slime.velocityX) > 1) {
-                this.velocityX += slime.velocityX * 0.05;
+            // Better slime influence for control
+            if (Math.abs(slime.velocityX) > 0.5) {
+                this.velocityX += slime.velocityX * 0.08;
             }
-            if (slime.velocityY < -1) {
-                this.velocityY += slime.velocityY * 0.05;
+            if (slime.velocityY < -0.5) {
+                this.velocityY += slime.velocityY * 0.08;
             }
             
             this.x += this.velocityX;
