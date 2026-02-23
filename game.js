@@ -115,14 +115,14 @@ class Ball {
         this.velocityY = 0;
         this.color = '#FFD700';
         
-        console.log(`Ball starting on ${side} side at x=${this.x}`);
+        console.log(`Ball reset: starting on ${side} side at x=${this.x}, canvas.width=${canvas.width}`);
     }
     
     update() {
         this.velocityY += BALL_GRAVITY;
         
-        // Cap maximum velocities (higher for bouncy gameplay)
-        const maxVelocity = 2;
+        // Higher velocity cap for powerful shots
+        const maxVelocity = 4;
         this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityX));
         this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityY));
         
@@ -173,16 +173,17 @@ class Ball {
             const ax = targetX - this.x;
             const ay = targetY - this.y;
             
-            // MUCH more powerful collision (200% boost)
-            this.velocityX = Math.cos(angle) * 1.2; // 3x stronger
-            this.velocityY = Math.sin(angle) * 1.2 - 0.3; // 3x stronger
+            // EXTREMELY powerful collision for proper gameplay
+            const baseForce = 2.5; // Much stronger base force
+            this.velocityX = Math.cos(angle) * baseForce;
+            this.velocityY = Math.sin(angle) * baseForce - 0.8; // Strong upward component
             
-            // Strong slime influence for better control
-            if (Math.abs(slime.velocityX) > 0.5) {
-                this.velocityX += slime.velocityX * 0.25; // 3x stronger
+            // Major slime velocity influence
+            if (Math.abs(slime.velocityX) > 0.3) {
+                this.velocityX += slime.velocityX * 0.6; // Much stronger influence
             }
-            if (slime.velocityY < -0.5) {
-                this.velocityY += slime.velocityY * 0.25; // 3x stronger
+            if (slime.velocityY < -0.3) {
+                this.velocityY += slime.velocityY * 0.6; // Strong upward boost when jumping
             }
             
             this.x += this.velocityX;
