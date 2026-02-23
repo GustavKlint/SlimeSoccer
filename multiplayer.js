@@ -153,7 +153,7 @@ class MultiplayerManager {
         } else if (data.type === 'pong') {
             this.lastPing = Date.now() - data.time;
             document.getElementById('pingDisplay').textContent = `Ping: ${this.lastPing}ms`;
-        } else if (data.type === 'gameState' && window.game) {
+        } else if ((data.type === 'hostState' || data.type === 'guestState') && window.game) {
             window.game.receiveState(data);
         } else if (data.type === 'input' && window.game) {
             window.game.receiveInput(data);

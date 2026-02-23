@@ -5,7 +5,7 @@ canvas.width = 800;
 canvas.height = 400;
 
 const GRAVITY = 0.5;
-const BALL_GRAVITY = 0.25;
+const BALL_GRAVITY = 0.15;
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
@@ -104,7 +104,7 @@ class Ball {
         this.x = canvas.width / 2;
         this.y = 100;
         this.radius = 15;
-        this.velocityX = (Math.random() - 0.5) * 3;
+        this.velocityX = (Math.random() - 0.5) * 2;
         this.velocityY = 0;
         this.color = '#FFD700';
     }
@@ -154,8 +154,8 @@ class Ball {
             const ax = targetX - this.x;
             const ay = targetY - this.y;
             
-            this.velocityX = ax * 0.3 + slime.velocityX * 0.2;
-            this.velocityY = ay * 0.3 + slime.velocityY * 0.2;
+            this.velocityX = ax * 0.2 + slime.velocityX * 0.15;
+            this.velocityY = ay * 0.2 - 2;
             
             this.x += this.velocityX;
             this.y += this.velocityY;
@@ -326,7 +326,7 @@ class Game {
     }
     
     receiveState(data) {
-        if (!this.isHost) {
+        if (data.type === 'hostState' && !this.isHost) {
             this.ball.x = data.ball.x;
             this.ball.y = data.ball.y;
             this.ball.velocityX = data.ball.velocityX;
@@ -343,6 +343,11 @@ class Game {
             
             this.updateScore();
             this.updateTimer();
+        } else if (data.type === 'guestState' && this.isHost) {
+            this.player2.x = data.player2.x;
+            this.player2.y = data.player2.y;
+            this.player2.velocityX = data.player2.velocityX;
+            this.player2.velocityY = data.player2.velocityY;
         }
     }
     
@@ -403,7 +408,7 @@ class Game {
                 this.syncCounter = 0;
                 if (this.multiplayerManager) {
                     this.multiplayerManager.send({
-                        type: 'gameState',
+                        type: 'hostState',
                         ball: {
                             x: this.ball.x,
                             y: this.ball.y,
@@ -424,6 +429,18 @@ class Game {
             }
         } else if (this.isOnline && !this.isHost) {
             this.player2.update();
+            
+            if (this.multiplayerManager) {
+                this.multiplayerManager.send({
+                    type: 'guestState',
+                    player2: {
+                        x: this.player2.x,
+                        y: this.player2.y,
+                        velocityX: this.player2.velocityX,
+                        velocityY: this.player2.velocityY
+                    }
+                });
+            }
         } else {
             this.player1.update();
             this.player2.update();
