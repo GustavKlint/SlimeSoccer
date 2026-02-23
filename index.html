@@ -3,43 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slime Soccer</title>
+    <title>Slime Soccer - Multiplayer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
-        <div class="score-board">
-            <div class="player-score">
-                <span class="player-name">Player 1</span>
-                <span class="score" id="score1">0</span>
+        <div id="menuScreen" class="menu-screen">
+            <h1>Slime Soccer</h1>
+            <div class="menu-buttons">
+                <button id="localPlayBtn" class="menu-btn">Local Play (Same Computer)</button>
+                <button id="createRoomBtn" class="menu-btn">Create Online Room</button>
+                <button id="joinRoomBtn" class="menu-btn">Join Online Room</button>
             </div>
-            <div class="timer" id="timer">3:00</div>
-            <div class="player-score">
-                <span class="player-name">Player 2</span>
-                <span class="score" id="score2">0</span>
+            <div id="roomInfo" class="room-info" style="display: none;">
+                <h3>Room Code:</h3>
+                <div class="room-code" id="roomCode"></div>
+                <p>Share this code with your friend!</p>
+                <div class="status" id="connectionStatus">Waiting for player...</div>
+            </div>
+            <div id="joinForm" class="join-form" style="display: none;">
+                <h3>Enter Room Code:</h3>
+                <input type="text" id="roomCodeInput" placeholder="Enter room code">
+                <button id="connectBtn">Connect</button>
+                <button id="backBtn">Back</button>
+                <div class="status" id="joinStatus"></div>
             </div>
         </div>
         
-        <canvas id="gameCanvas"></canvas>
-        
-        <div class="controls">
-            <div class="player-controls">
-                <h3>Player 1 (Blue)</h3>
-                <p>Move: A/D</p>
-                <p>Jump: W</p>
+        <div id="gameScreen" style="display: none;">
+            <div class="score-board">
+                <div class="player-score">
+                    <span class="player-name" id="p1name">Player 1</span>
+                    <span class="score" id="score1">0</span>
+                </div>
+                <div class="timer" id="timer">3:00</div>
+                <div class="player-score">
+                    <span class="player-name" id="p2name">Player 2</span>
+                    <span class="score" id="score2">0</span>
+                </div>
             </div>
-            <div class="game-controls">
-                <button id="startBtn">Start Game</button>
-                <button id="resetBtn">Reset</button>
-            </div>
-            <div class="player-controls">
-                <h3>Player 2 (Red)</h3>
-                <p>Move: ←/→</p>
-                <p>Jump: ↑</p>
+            
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="controls">
+                <div class="player-controls">
+                    <h3>Your Controls</h3>
+                    <p>Move: A/D or ←/→</p>
+                    <p>Jump: W or ↑</p>
+                </div>
+                <div class="game-controls">
+                    <button id="startBtn">Start Game</button>
+                    <button id="resetBtn">Reset</button>
+                    <button id="backToMenuBtn">Back to Menu</button>
+                </div>
+                <div class="connection-info">
+                    <span id="pingDisplay">Ping: --</span>
+                    <span id="connectionDisplay">Local Play</span>
+                </div>
             </div>
         </div>
     </div>
     
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+    <script src="multiplayer.js"></script>
     <script src="game.js"></script>
 </body>
 </html>

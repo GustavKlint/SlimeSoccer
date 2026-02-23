@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(git init)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git commit -m \"Initial commit: Slime Soccer game\n\n- Two-player slime soccer game\n- Local multiplayer support\n- Physics-based gameplay\n- Score tracking and timer\n\n🤖 Generated with Claude Code (https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\")",
+      "Bash(gh repo create slime-soccer --public --source=. --remote=origin --push)",
+      "Bash(git branch -M main)",
+      "Bash(curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: token $GITHUB_TOKEN\" https://api.github.com/user/repos -d '{\"\"name\"\":\"\"slime-soccer\"\",\"\"public\"\":true,\"\"description\"\":\"\"Classic Slime Soccer game recreation\"\",\"\"homepage\"\":\"\"https://gustavklint.github.io/slime-soccer/\"\"}')",
+      "Bash(git config --global user.name)",
+      "Bash(winget install --id GitHub.cli -e --silent)",
+      "Bash(powershell -Command \"Start-Process ''https://github.com/new''\")",
+      "Bash(git remote add origin https://github.com/GustavKlint/SlimeSoccer.git)",
+      "Bash(git push -u origin main)",
+      "Bash(git add -A)"
     ],
     "deny": [],
     "ask": []

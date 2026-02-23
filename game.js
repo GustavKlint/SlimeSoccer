@@ -5,7 +5,7 @@ canvas.width = 800;
 canvas.height = 400;
 
 const GRAVITY = 0.5;
-const BALL_GRAVITY = 0.4;
+const BALL_GRAVITY = 0.25;
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
@@ -28,15 +28,15 @@ class Slime {
     }
     
     update() {
-        if (this.keys[this.controls.left]) {
+        if (this.keys[this.controls.left] || this.keys[this.controls.left2]) {
             this.velocityX = -this.speed;
-        } else if (this.keys[this.controls.right]) {
+        } else if (this.keys[this.controls.right] || this.keys[this.controls.right2]) {
             this.velocityX = this.speed;
         } else {
             this.velocityX *= 0.8;
         }
         
-        if (this.keys[this.controls.jump] && this.onGround) {
+        if ((this.keys[this.controls.jump] || this.keys[this.controls.jump2]) && this.onGround) {
             this.velocityY = -this.jumpPower;
             this.onGround = false;
         }
@@ -104,7 +104,7 @@ class Ball {
         this.x = canvas.width / 2;
         this.y = 100;
         this.radius = 15;
-        this.velocityX = (Math.random() - 0.5) * 4;
+        this.velocityX = (Math.random() - 0.5) * 3;
         this.velocityY = 0;
         this.color = '#FFD700';
     }
@@ -154,8 +154,8 @@ class Ball {
             const ax = targetX - this.x;
             const ay = targetY - this.y;
             
-            this.velocityX = ax * 0.5 + slime.velocityX * 0.3;
-            this.velocityY = ay * 0.5 + slime.velocityY * 0.3;
+            this.velocityX = ax * 0.3 + slime.velocityX * 0.2;
+            this.velocityY = ay * 0.3 + slime.velocityY * 0.2;
             
             this.x += this.velocityX;
             this.y += this.velocityY;
@@ -188,6 +188,9 @@ class Game {
             left: 'a',
             right: 'd',
             jump: 'w',
+            left2: 'ArrowLeft',
+            right2: 'ArrowRight',
+            jump2: 'ArrowUp',
             side: 'left'
         });
         
@@ -195,6 +198,9 @@ class Game {
             left: 'ArrowLeft',
             right: 'ArrowRight',
             jump: 'ArrowUp',
+            left2: 'a',
+            right2: 'd',
+            jump2: 'w',
             side: 'right'
         });
         
@@ -206,6 +212,14 @@ class Game {
         this.lastTime = 0;
         this.timeAccumulator = 0;
         
+        this.isOnline = false;
+        this.isHost = false;
+        this.multiplayerManager = null;
+        this.syncCounter = 0;
+        
+        this.localPlayer = null;
+        this.remotePlayer = null;
+        
         this.setupControls();
         this.setupButtons();
     }
@@ -213,30 +227,73 @@ class Game {
     setupControls() {
         window.addEventListener('keydown', (e) => {
             e.preventDefault();
-            this.player1.keys[e.key.toLowerCase()] = true;
-            this.player2.keys[e.key] = true;
+            const key = e.key.toLowerCase();
+            
+            if (this.isOnline) {
+                if (this.localPlayer) {
+                    this.localPlayer.keys[key] = true;
+                    this.localPlayer.keys[e.key] = true;
+                    
+                    if (this.multiplayerManager) {
+                        this.multiplayerManager.send({
+                            type: 'input',
+                            keys: this.localPlayer.keys
+                        });
+                    }
+                }
+            } else {
+                this.player1.keys[key] = true;
+                this.player2.keys[e.key] = true;
+            }
         });
         
         window.addEventListener('keyup', (e) => {
             e.preventDefault();
-            this.player1.keys[e.key.toLowerCase()] = false;
-            this.player2.keys[e.key] = false;
+            const key = e.key.toLowerCase();
+            
+            if (this.isOnline) {
+                if (this.localPlayer) {
+                    this.localPlayer.keys[key] = false;
+                    this.localPlayer.keys[e.key] = false;
+                    
+                    if (this.multiplayerManager) {
+                        this.multiplayerManager.send({
+                            type: 'input',
+                            keys: this.localPlayer.keys
+                        });
+                    }
+                }
+            } else {
+                this.player1.keys[key] = false;
+                this.player2.keys[e.key] = false;
+            }
         });
     }
     
     setupButtons() {
         document.getElementById('startBtn').addEventListener('click', () => {
             this.start();
+            if (this.isOnline && this.multiplayerManager) {
+                this.multiplayerManager.send({ type: 'start' });
+            }
         });
         
         document.getElementById('resetBtn').addEventListener('click', () => {
             this.reset();
+            if (this.isOnline && this.multiplayerManager) {
+                this.multiplayerManager.send({ type: 'reset' });
+            }
         });
     }
     
     start() {
         this.gameRunning = true;
         this.lastTime = Date.now();
+        
+        if (this.isOnline) {
+            this.localPlayer = this.isHost ? this.player1 : this.player2;
+            this.remotePlayer = this.isHost ? this.player2 : this.player1;
+        }
     }
     
     reset() {
@@ -247,10 +304,46 @@ class Game {
         this.ball.reset();
         this.player1.x = 200;
         this.player1.y = GROUND_Y;
+        this.player1.velocityX = 0;
+        this.player1.velocityY = 0;
         this.player2.x = 600;
         this.player2.y = GROUND_Y;
+        this.player2.velocityX = 0;
+        this.player2.velocityY = 0;
         this.updateScore();
         this.updateTimer();
+        
+        if (this.isOnline) {
+            this.localPlayer = this.isHost ? this.player1 : this.player2;
+            this.remotePlayer = this.isHost ? this.player2 : this.player1;
+        }
+    }
+    
+    receiveInput(data) {
+        if (this.remotePlayer) {
+            this.remotePlayer.keys = data.keys || {};
+        }
+    }
+    
+    receiveState(data) {
+        if (!this.isHost) {
+            this.ball.x = data.ball.x;
+            this.ball.y = data.ball.y;
+            this.ball.velocityX = data.ball.velocityX;
+            this.ball.velocityY = data.ball.velocityY;
+            
+            this.player1.x = data.player1.x;
+            this.player1.y = data.player1.y;
+            this.player1.velocityX = data.player1.velocityX;
+            this.player1.velocityY = data.player1.velocityY;
+            
+            this.score1 = data.score1;
+            this.score2 = data.score2;
+            this.gameTime = data.gameTime;
+            
+            this.updateScore();
+            this.updateTimer();
+        }
     }
     
     checkGoal() {
@@ -297,14 +390,48 @@ class Game {
             }
         }
         
-        this.player1.update();
-        this.player2.update();
-        this.ball.update();
-        
-        this.ball.checkSlimeCollision(this.player1);
-        this.ball.checkSlimeCollision(this.player2);
-        
-        this.checkGoal();
+        if (this.isOnline && this.isHost) {
+            this.player1.update();
+            this.player2.update();
+            this.ball.update();
+            this.ball.checkSlimeCollision(this.player1);
+            this.ball.checkSlimeCollision(this.player2);
+            this.checkGoal();
+            
+            this.syncCounter++;
+            if (this.syncCounter >= 2) {
+                this.syncCounter = 0;
+                if (this.multiplayerManager) {
+                    this.multiplayerManager.send({
+                        type: 'gameState',
+                        ball: {
+                            x: this.ball.x,
+                            y: this.ball.y,
+                            velocityX: this.ball.velocityX,
+                            velocityY: this.ball.velocityY
+                        },
+                        player1: {
+                            x: this.player1.x,
+                            y: this.player1.y,
+                            velocityX: this.player1.velocityX,
+                            velocityY: this.player1.velocityY
+                        },
+                        score1: this.score1,
+                        score2: this.score2,
+                        gameTime: this.gameTime
+                    });
+                }
+            }
+        } else if (this.isOnline && !this.isHost) {
+            this.player2.update();
+        } else {
+            this.player1.update();
+            this.player2.update();
+            this.ball.update();
+            this.ball.checkSlimeCollision(this.player1);
+            this.ball.checkSlimeCollision(this.player2);
+            this.checkGoal();
+        }
     }
     
     gameOver() {
@@ -318,9 +445,11 @@ class Game {
         
         ctx.font = 'bold 32px Arial';
         if (this.score1 > this.score2) {
-            ctx.fillText('Player 1 Wins!', canvas.width / 2, canvas.height / 2 + 20);
+            const winner = this.isOnline ? (this.isHost ? 'You Win!' : 'You Lose!') : 'Player 1 Wins!';
+            ctx.fillText(winner, canvas.width / 2, canvas.height / 2 + 20);
         } else if (this.score2 > this.score1) {
-            ctx.fillText('Player 2 Wins!', canvas.width / 2, canvas.height / 2 + 20);
+            const winner = this.isOnline ? (this.isHost ? 'You Lose!' : 'You Win!') : 'Player 2 Wins!';
+            ctx.fillText(winner, canvas.width / 2, canvas.height / 2 + 20);
         } else {
             ctx.fillText('It\'s a Draw!', canvas.width / 2, canvas.height / 2 + 20);
         }
@@ -366,5 +495,6 @@ class Game {
 }
 
 const game = new Game();
+window.game = game;
 game.updateTimer();
 game.gameLoop();
