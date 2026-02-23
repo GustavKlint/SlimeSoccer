@@ -255,6 +255,10 @@ class Game {
     
     setupControls() {
         window.addEventListener('keydown', (e) => {
+            // Don't prevent default if user is typing in an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
             e.preventDefault();
             const key = e.key.toLowerCase();
             
@@ -277,6 +281,10 @@ class Game {
         });
         
         window.addEventListener('keyup', (e) => {
+            // Don't prevent default if user is typing in an input field
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
             e.preventDefault();
             const key = e.key.toLowerCase();
             
