@@ -4,8 +4,8 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 400;
 
-const GRAVITY = 0.5;
-const BALL_GRAVITY = 0.08;
+const GRAVITY = 0.4;
+const BALL_GRAVITY = 0.2;
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
@@ -20,8 +20,8 @@ class Slime {
         this.color = color;
         this.velocityX = 0;
         this.velocityY = 0;
-        this.speed = 5;
-        this.jumpPower = 12;
+        this.speed = 4;
+        this.jumpPower = 10;
         this.onGround = true;
         this.controls = controls;
         this.keys = {};
@@ -104,7 +104,7 @@ class Ball {
         this.x = canvas.width / 2;
         this.y = 100;
         this.radius = 15;
-        this.velocityX = (Math.random() - 0.5) * 1;
+        this.velocityX = (Math.random() - 0.5) * 2;
         this.velocityY = 0;
         this.color = '#FFD700';
     }
@@ -113,22 +113,22 @@ class Ball {
         this.velocityY += BALL_GRAVITY;
         
         // Cap maximum velocities
-        const maxVelocity = 8;
+        const maxVelocity = 10;
         this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityX));
-        this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityY));
+        this.velocityY = Math.max(-maxVelocity * 1.5, Math.min(maxVelocity * 1.5, this.velocityY));
         
         this.x += this.velocityX;
         this.y += this.velocityY;
         
         if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
-            this.velocityX = -this.velocityX * 0.6;
+            this.velocityX = -this.velocityX * 0.85;
             this.x = this.x - this.radius < 0 ? this.radius : canvas.width - this.radius;
         }
         
         if (this.y + this.radius > GROUND_Y) {
-            this.velocityY = -this.velocityY * 0.5;
+            this.velocityY = -this.velocityY * 0.65;
             this.y = GROUND_Y - this.radius;
-            this.velocityX *= 0.85;
+            this.velocityX *= 0.95;
             
             if (Math.abs(this.velocityY) < 1) {
                 this.velocityY = 0;
@@ -160,8 +160,16 @@ class Ball {
             const ax = targetX - this.x;
             const ay = targetY - this.y;
             
-            this.velocityX = ax * 0.1 + slime.velocityX * 0.1;
-            this.velocityY = ay * 0.1 - 1;
+            // Calculate proper collision response
+            const impactSpeed = Math.sqrt(slime.velocityX * slime.velocityX + slime.velocityY * slime.velocityY);
+            const force = Math.min(impactSpeed * 0.5, 5);
+            
+            this.velocityX = Math.cos(angle) * force * 2;
+            this.velocityY = Math.sin(angle) * force * 2 - 3;
+            
+            // Add slime's velocity influence
+            this.velocityX += slime.velocityX * 0.3;
+            this.velocityY += slime.velocityY * 0.3;
             
             this.x += this.velocityX;
             this.y += this.velocityY;

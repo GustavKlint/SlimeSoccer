@@ -16,7 +16,13 @@
       "Bash(git commit -m \"Add online multiplayer and improve ball physics\n\n- Fixed ball physics with reduced gravity and speed\n- Added online multiplayer using PeerJS\n- Create/join room system with room codes\n- Real-time game synchronization between players\n- Ping monitoring for connection quality\n- Both local and online play modes\n- Improved UI with menu system\n\nPlayers can now play from different computers!\")",
       "Bash(git push origin main)",
       "Bash(git commit -m \"Fix slime semicircle orientation\n\n- Slimes now properly display as semicircles sitting on ground\n- Eyes positioned correctly on top of slime\n- Fixed collision detection to match visual representation\")",
-      "Bash(git commit -m \"Fix ball physics and multiplayer sync\n\n- Further reduced ball gravity (0.15) and speed\n- Fixed ball collision response for more realistic bounces\n- Fixed multiplayer synchronization - both players now visible to each other\n- Host sends game state, guest sends their position\n- Proper bi-directional sync between players\")"
+      "Bash(git commit -m \"Fix ball physics and multiplayer sync\n\n- Further reduced ball gravity (0.15) and speed\n- Fixed ball collision response for more realistic bounces\n- Fixed multiplayer synchronization - both players now visible to each other\n- Host sends game state, guest sends their position\n- Proper bi-directional sync between players\")",
+      "Bash(git commit -m \"Drastically reduce ball physics speed\n\n- Reduced ball gravity to 0.08 (from 0.15)\n- Reduced initial ball velocity\n- Added velocity cap of 8 units max\n- Reduced bounce coefficients\n- Made slime collisions much softer\n- Ball should now move at a playable speed\")",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "WebSearch",
+      "WebFetch(domain:hectorbennett.itch.io)",
+      "Bash(git commit -m \"Adapt physics to classic Slime Soccer feel\n\n- Increased ball gravity to 0.2 for more realistic arc\n- Better bounce coefficients (65% vertical, 85% horizontal)\n- Improved slime collision with directional response\n- Slime movement slightly slower for better control\n- Ball responds to slime impact force and direction\n- More authentic classic arcade physics feel\")"
     ],
     "deny": [],
     "ask": []
