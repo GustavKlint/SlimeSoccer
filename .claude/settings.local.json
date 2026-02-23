@@ -22,7 +22,8 @@
       "WebFetch(domain:github.com)",
       "WebSearch",
       "WebFetch(domain:hectorbennett.itch.io)",
-      "Bash(git commit -m \"Adapt physics to classic Slime Soccer feel\n\n- Increased ball gravity to 0.2 for more realistic arc\n- Better bounce coefficients (65% vertical, 85% horizontal)\n- Improved slime collision with directional response\n- Slime movement slightly slower for better control\n- Ball responds to slime impact force and direction\n- More authentic classic arcade physics feel\")"
+      "Bash(git commit -m \"Adapt physics to classic Slime Soccer feel\n\n- Increased ball gravity to 0.2 for more realistic arc\n- Better bounce coefficients (65% vertical, 85% horizontal)\n- Improved slime collision with directional response\n- Slime movement slightly slower for better control\n- Ball responds to slime impact force and direction\n- More authentic classic arcade physics feel\")",
+      "Bash(git commit -m \"Add version number v1.0.5 to menu screen\n\n- Added version display below title\n- Shows v1.0.5 so users know when refresh worked\n- Styled with monospace font in gray\")"
     ],
     "deny": [],
     "ask": []
