@@ -5,7 +5,7 @@ canvas.width = 800;
 canvas.height = 400;
 
 const GRAVITY = 0.5;
-const BALL_GRAVITY = 0.15;
+const BALL_GRAVITY = 0.08;
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
@@ -104,25 +104,31 @@ class Ball {
         this.x = canvas.width / 2;
         this.y = 100;
         this.radius = 15;
-        this.velocityX = (Math.random() - 0.5) * 2;
+        this.velocityX = (Math.random() - 0.5) * 1;
         this.velocityY = 0;
         this.color = '#FFD700';
     }
     
     update() {
         this.velocityY += BALL_GRAVITY;
+        
+        // Cap maximum velocities
+        const maxVelocity = 8;
+        this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityX));
+        this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityY));
+        
         this.x += this.velocityX;
         this.y += this.velocityY;
         
         if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
-            this.velocityX = -this.velocityX * 0.8;
+            this.velocityX = -this.velocityX * 0.6;
             this.x = this.x - this.radius < 0 ? this.radius : canvas.width - this.radius;
         }
         
         if (this.y + this.radius > GROUND_Y) {
-            this.velocityY = -this.velocityY * 0.7;
+            this.velocityY = -this.velocityY * 0.5;
             this.y = GROUND_Y - this.radius;
-            this.velocityX *= 0.9;
+            this.velocityX *= 0.85;
             
             if (Math.abs(this.velocityY) < 1) {
                 this.velocityY = 0;
@@ -154,8 +160,8 @@ class Ball {
             const ax = targetX - this.x;
             const ay = targetY - this.y;
             
-            this.velocityX = ax * 0.2 + slime.velocityX * 0.15;
-            this.velocityY = ay * 0.2 - 2;
+            this.velocityX = ax * 0.1 + slime.velocityX * 0.1;
+            this.velocityY = ay * 0.1 - 1;
             
             this.x += this.velocityX;
             this.y += this.velocityY;
