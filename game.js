@@ -5,7 +5,7 @@ canvas.width = 800;
 canvas.height = 400;
 
 const GRAVITY = 0.25;
-const BALL_GRAVITY = 0.008;
+const BALL_GRAVITY = 0.016;
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
