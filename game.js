@@ -71,24 +71,24 @@ class Slime {
         ctx.save();
         ctx.fillStyle = this.color;
         ctx.beginPath();
-        ctx.arc(this.x, this.y + this.radius, this.radius, Math.PI, 0, true);
+        ctx.arc(this.x, this.y + this.radius, this.radius, Math.PI, 0, false);
         ctx.closePath();
         ctx.fill();
         
         ctx.fillStyle = 'white';
         ctx.beginPath();
-        ctx.arc(this.x - 10, this.y + this.radius - 20, 5, 0, Math.PI * 2);
+        ctx.arc(this.x - 10, this.y + 20, 5, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(this.x + 10, this.y + this.radius - 20, 5, 0, Math.PI * 2);
+        ctx.arc(this.x + 10, this.y + 20, 5, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.fillStyle = 'black';
         ctx.beginPath();
-        ctx.arc(this.x - 10, this.y + this.radius - 20, 2, 0, Math.PI * 2);
+        ctx.arc(this.x - 10, this.y + 20, 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(this.x + 10, this.y + this.radius - 20, 2, 0, Math.PI * 2);
+        ctx.arc(this.x + 10, this.y + 20, 2, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.restore();

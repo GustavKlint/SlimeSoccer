@@ -12,7 +12,9 @@
       "Bash(powershell -Command \"Start-Process ''https://github.com/new''\")",
       "Bash(git remote add origin https://github.com/GustavKlint/SlimeSoccer.git)",
       "Bash(git push -u origin main)",
-      "Bash(git add -A)"
+      "Bash(git add -A)",
+      "Bash(git commit -m \"Add online multiplayer and improve ball physics\n\n- Fixed ball physics with reduced gravity and speed\n- Added online multiplayer using PeerJS\n- Create/join room system with room codes\n- Real-time game synchronization between players\n- Ping monitoring for connection quality\n- Both local and online play modes\n- Improved UI with menu system\n\nPlayers can now play from different computers!\")",
+      "Bash(git push origin main)"
     ],
     "deny": [],
     "ask": []
