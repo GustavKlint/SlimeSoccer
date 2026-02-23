@@ -110,6 +110,19 @@ body {
     border-radius: 8px;
     margin: 10px 0;
     text-align: center;
+    background: white;
+    color: #333;
+    outline: none;
+    pointer-events: auto;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+#roomCodeInput:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
 }
 
 #connectBtn, #backBtn {

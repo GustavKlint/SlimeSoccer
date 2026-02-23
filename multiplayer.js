@@ -89,7 +89,21 @@ class MultiplayerManager {
     showJoinForm() {
         document.getElementById('joinForm').style.display = 'block';
         document.querySelector('.menu-buttons').style.display = 'none';
-        document.getElementById('roomCodeInput').focus();
+        
+        // Add debugging and ensure input works
+        const input = document.getElementById('roomCodeInput');
+        input.value = ''; // Clear any existing value
+        input.focus();
+        
+        // Add debugging listeners
+        input.addEventListener('keypress', (e) => {
+            console.log('Key pressed in input:', e.key);
+        });
+        input.addEventListener('input', (e) => {
+            console.log('Input changed to:', e.target.value);
+        });
+        
+        console.log('Join form shown, input focused');
     }
     
     joinRoom(hostId) {

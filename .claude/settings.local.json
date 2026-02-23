@@ -1,37 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git init)",
-      "Bash(git add .)",
-      "Bash(git commit -m \"Initial commit: Slime Soccer game\n\n- Two-player slime soccer game\n- Local multiplayer support\n- Physics-based gameplay\n- Score tracking and timer\n\n🤖 Generated with Claude Code (https://claude.ai/code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\")",
-      "Bash(gh repo create slime-soccer --public --source=. --remote=origin --push)",
-      "Bash(git branch -M main)",
-      "Bash(curl -X POST -H \"Accept: application/vnd.github.v3+json\" -H \"Authorization: token $GITHUB_TOKEN\" https://api.github.com/user/repos -d '{\"\"name\"\":\"\"slime-soccer\"\",\"\"public\"\":true,\"\"description\"\":\"\"Classic Slime Soccer game recreation\"\",\"\"homepage\"\":\"\"https://gustavklint.github.io/slime-soccer/\"\"}')",
-      "Bash(git config --global user.name)",
-      "Bash(winget install --id GitHub.cli -e --silent)",
-      "Bash(powershell -Command \"Start-Process ''https://github.com/new''\")",
-      "Bash(git remote add origin https://github.com/GustavKlint/SlimeSoccer.git)",
-      "Bash(git push -u origin main)",
-      "Bash(git add -A)",
-      "Bash(git commit -m \"Add online multiplayer and improve ball physics\n\n- Fixed ball physics with reduced gravity and speed\n- Added online multiplayer using PeerJS\n- Create/join room system with room codes\n- Real-time game synchronization between players\n- Ping monitoring for connection quality\n- Both local and online play modes\n- Improved UI with menu system\n\nPlayers can now play from different computers!\")",
-      "Bash(git push origin main)",
-      "Bash(git commit -m \"Fix slime semicircle orientation\n\n- Slimes now properly display as semicircles sitting on ground\n- Eyes positioned correctly on top of slime\n- Fixed collision detection to match visual representation\")",
-      "Bash(git commit -m \"Fix ball physics and multiplayer sync\n\n- Further reduced ball gravity (0.15) and speed\n- Fixed ball collision response for more realistic bounces\n- Fixed multiplayer synchronization - both players now visible to each other\n- Host sends game state, guest sends their position\n- Proper bi-directional sync between players\")",
-      "Bash(git commit -m \"Drastically reduce ball physics speed\n\n- Reduced ball gravity to 0.08 (from 0.15)\n- Reduced initial ball velocity\n- Added velocity cap of 8 units max\n- Reduced bounce coefficients\n- Made slime collisions much softer\n- Ball should now move at a playable speed\")",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:github.com)",
-      "WebSearch",
-      "WebFetch(domain:hectorbennett.itch.io)",
-      "Bash(git commit -m \"Adapt physics to classic Slime Soccer feel\n\n- Increased ball gravity to 0.2 for more realistic arc\n- Better bounce coefficients (65% vertical, 85% horizontal)\n- Improved slime collision with directional response\n- Slime movement slightly slower for better control\n- Ball responds to slime impact force and direction\n- More authentic classic arcade physics feel\")",
-      "Bash(git commit -m \"Add version number v1.0.5 to menu screen\n\n- Added version display below title\n- Shows v1.0.5 so users know when refresh worked\n- Styled with monospace font in gray\")",
-      "Bash(git commit -m \"Drastically slow down ball physics (v1.0.6)\n\n- Reduced ball gravity to 0.1 (half of previous)\n- Reduced max velocity cap to 5 (from 10)\n- Simplified collision to fixed gentle push\n- Reduced all bounce and friction factors\n- Ball should now move much slower and more controlled\")",
-      "Bash(git commit -m \"EXTREME ball physics reduction (v1.0.7)\n\n- Ball gravity: 0.05 (was 0.1) - extremely slow fall\n- Max velocity: 3 (was 5) - much slower movement  \n- Added 0.99 damping to continuously slow ball down\n- Ground bounce: 40% (was 60%)\n- Wall bounce: 50% (was 70%)\n- Collision force: 1.5 (was 3)\n- Ball should now be MUCH slower and controlled\")",
-      "Bash(git commit -m \"Fix 60fps physics issue (v1.0.8)\n\nFOUND THE PROBLEM: Physics were calculated for 60fps but values were too high\n\n- Ball gravity: 0.008 (was 0.05) - proper for 60fps\n- Max velocity: 1 (was 3) - appropriate for frame rate  \n- Collision force: 0.3 (was 1.5) - much gentler\n- Initial velocity: 0.1 (was 0.5) - barely moving\n- Ball should finally be slow and controllable\")",
-      "Bash(git commit -m \"Make ball more bouncy and improve gameplay (v1.0.9)\n\n- Ball now starts randomly on left or right side (no more net rushing!)\n- Much more bouncy: 70% ground bounce (was 40%), 80% wall bounce (was 50%)\n- Improved slime collision response for better ball control\n- Less ground friction so ball keeps moving\n- Higher starting drop position for better action\")",
-      "Bash(git commit -m \"Massively increase slime collision power and fix ball start position (v1.1.0)\n\n- Slime collision force increased 3x (0.4 -> 1.2) for 200%+ power boost\n- Slime velocity influence tripled for better ball control\n- Increased max ball velocity to 2 for faster action\n- Fixed ball starting position with explicit coordinates (150 or 650)\n- Added debug logging to track ball start position\n- Ball should now launch much faster from slime hits\")",
-      "Bash(git commit -m \"MASSIVE collision power increase and debug ball spawning (v1.1.1)\n\n- Collision force now 2.5 (was 1.2) - should launch ball way over net\n- Slime velocity influence increased to 60% for powerful shots\n- Max ball velocity raised to 4 for long-distance shots  \n- Added detailed debug logging for ball spawn position\n- Ball should now fly far when hit by slimes\n- Debug logs will show if ball spawning works correctly\")",
-      "Bash(git commit -m \"Double ball gravity for better physics (v1.1.2)\n\n- Ball gravity: 0.016 (was 0.008) - doubled for more realistic arc\n- Should make ball trajectory feel more natural\n- Combined with powerful collisions for good gameplay balance\")",
-      "Bash(git commit -m \"Fix room code input field typing issue (v1.1.3)\n\n- Game was calling preventDefault() on ALL keydown events\n- Now only prevents default for game controls, not input fields\n- Users can now type in the room code input field\n- Fixed both keydown and keyup event handlers\")"
+      "Bash(git commit -m \"Enhanced input field debugging and fixes (v1.1.4)\n\n- Added explicit CSS properties for input field interaction\n- Added pointer-events auto and user-select text\n- Enhanced input attributes with maxlength and autocomplete\n- Added comprehensive debugging to track input events\n- Input field should now be fully functional\n- Check browser console for debugging info\")"
     ],
     "deny": [],
     "ask": []
