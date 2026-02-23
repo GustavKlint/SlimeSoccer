@@ -101,26 +101,28 @@ class Ball {
     }
     
     reset() {
-        // Start ball on either player's side
+        // Start ball clearly on one side or the other
         const side = Math.random() < 0.5 ? 'left' : 'right';
         if (side === 'left') {
-            this.x = canvas.width * 0.25; // Left side
+            this.x = 150; // Clearly on left side
         } else {
-            this.x = canvas.width * 0.75; // Right side
+            this.x = canvas.width - 150; // Clearly on right side
         }
         
-        this.y = 50; // Higher drop
+        this.y = 50; // High drop
         this.radius = 15;
-        this.velocityX = (Math.random() - 0.5) * 0.1;
+        this.velocityX = 0; // No initial horizontal movement
         this.velocityY = 0;
         this.color = '#FFD700';
+        
+        console.log(`Ball starting on ${side} side at x=${this.x}`);
     }
     
     update() {
         this.velocityY += BALL_GRAVITY;
         
-        // Cap maximum velocities (very low for 60fps)
-        const maxVelocity = 1;
+        // Cap maximum velocities (higher for bouncy gameplay)
+        const maxVelocity = 2;
         this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityX));
         this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityY));
         
@@ -171,16 +173,16 @@ class Ball {
             const ax = targetX - this.x;
             const ay = targetY - this.y;
             
-            // More responsive collision for better gameplay
-            this.velocityX = Math.cos(angle) * 0.4;
-            this.velocityY = Math.sin(angle) * 0.4 - 0.15;
+            // MUCH more powerful collision (200% boost)
+            this.velocityX = Math.cos(angle) * 1.2; // 3x stronger
+            this.velocityY = Math.sin(angle) * 1.2 - 0.3; // 3x stronger
             
-            // Better slime influence for control
+            // Strong slime influence for better control
             if (Math.abs(slime.velocityX) > 0.5) {
-                this.velocityX += slime.velocityX * 0.08;
+                this.velocityX += slime.velocityX * 0.25; // 3x stronger
             }
             if (slime.velocityY < -0.5) {
-                this.velocityY += slime.velocityY * 0.08;
+                this.velocityY += slime.velocityY * 0.25; // 3x stronger
             }
             
             this.x += this.velocityX;
