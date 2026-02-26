@@ -4,8 +4,8 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 400;
 
-const GRAVITY = 0.25;
-const BALL_GRAVITY = 0.025;
+const GRAVITY = 0.3;  // Faster falling for more intense gameplay
+const BALL_GRAVITY = 0.035;  // Much faster ball physics
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
@@ -20,11 +20,15 @@ class Slime {
         this.color = color;
         this.velocityX = 0;
         this.velocityY = 0;
-        this.speed = 2;
-        this.jumpPower = 6;
+        this.speed = 2.5;  // Increased speed for harder gameplay
+        this.jumpPower = 7;  // Higher jumps for more dynamic play
         this.onGround = true;
         this.controls = controls;
         this.keys = {};
+        
+        // Googly eyes properties
+        this.leftEye = { offsetX: 0, offsetY: 0, targetX: 0, targetY: 0 };
+        this.rightEye = { offsetX: 0, offsetY: 0, targetX: 0, targetY: 0 };
     }
     
     update() {
@@ -67,6 +71,40 @@ class Slime {
         }
     }
     
+    updateEyes(ballX, ballY) {
+        // Update googly eyes to look at ball
+        const leftEyeX = this.x - 10;
+        const leftEyeY = this.y + 20;
+        const rightEyeX = this.x + 10;
+        const rightEyeY = this.y + 20;
+        
+        // Calculate angle to ball for each eye
+        const leftAngle = Math.atan2(ballY - leftEyeY, ballX - leftEyeX);
+        const rightAngle = Math.atan2(ballY - rightEyeY, ballX - rightEyeX);
+        
+        // Calculate target positions with max radius of 2.5
+        const maxRadius = 2.5;
+        this.leftEye.targetX = Math.cos(leftAngle) * maxRadius;
+        this.leftEye.targetY = Math.sin(leftAngle) * maxRadius;
+        this.rightEye.targetX = Math.cos(rightAngle) * maxRadius;
+        this.rightEye.targetY = Math.sin(rightAngle) * maxRadius;
+        
+        // Add physics-based movement with acceleration and momentum
+        const springForce = 0.15;
+        const damping = 0.85;
+        
+        this.leftEye.offsetX = (this.leftEye.offsetX * damping) + (this.leftEye.targetX * springForce);
+        this.leftEye.offsetY = (this.leftEye.offsetY * damping) + (this.leftEye.targetY * springForce);
+        this.rightEye.offsetX = (this.rightEye.offsetX * damping) + (this.rightEye.targetX * springForce);
+        this.rightEye.offsetY = (this.rightEye.offsetY * damping) + (this.rightEye.targetY * springForce);
+        
+        // Add slime movement influence for googly effect
+        this.leftEye.offsetX += this.velocityX * 0.1;
+        this.leftEye.offsetY -= Math.abs(this.velocityY) * 0.05;
+        this.rightEye.offsetX += this.velocityX * 0.1;
+        this.rightEye.offsetY -= Math.abs(this.velocityY) * 0.05;
+    }
+    
     draw() {
         ctx.save();
         ctx.fillStyle = this.color;
@@ -75,20 +113,49 @@ class Slime {
         ctx.closePath();
         ctx.fill();
         
+        // Draw googly eyes
+        const leftEyeX = this.x - 10;
+        const leftEyeY = this.y + 20;
+        const rightEyeX = this.x + 10;
+        const rightEyeY = this.y + 20;
+        
+        // White part of eyes
         ctx.fillStyle = 'white';
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1.5;
+        
+        // Left eye
         ctx.beginPath();
-        ctx.arc(this.x - 10, this.y + 20, 5, 0, Math.PI * 2);
+        ctx.arc(leftEyeX, leftEyeY, 7, 0, Math.PI * 2);
         ctx.fill();
+        ctx.stroke();
+        
+        // Right eye
         ctx.beginPath();
-        ctx.arc(this.x + 10, this.y + 20, 5, 0, Math.PI * 2);
+        ctx.arc(rightEyeX, rightEyeY, 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Pupils (googly part)
+        ctx.fillStyle = 'black';
+        
+        // Left pupil
+        ctx.beginPath();
+        ctx.arc(leftEyeX + this.leftEye.offsetX, leftEyeY + this.leftEye.offsetY, 3, 0, Math.PI * 2);
         ctx.fill();
         
-        ctx.fillStyle = 'black';
+        // Right pupil
         ctx.beginPath();
-        ctx.arc(this.x - 10, this.y + 20, 2, 0, Math.PI * 2);
+        ctx.arc(rightEyeX + this.rightEye.offsetX, rightEyeY + this.rightEye.offsetY, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Add small white reflection for extra googly effect
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.arc(leftEyeX + this.leftEye.offsetX - 1, leftEyeY + this.leftEye.offsetY - 1, 1, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(this.x + 10, this.y + 20, 2, 0, Math.PI * 2);
+        ctx.arc(rightEyeX + this.rightEye.offsetX - 1, rightEyeY + this.rightEye.offsetY - 1, 1, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.restore();
@@ -122,14 +189,14 @@ class Ball {
     update() {
         this.velocityY += BALL_GRAVITY;
         
-        // Higher velocity cap for dynamic gameplay
-        const maxVelocity = 8;
+        // Higher velocity cap for intense gameplay
+        const maxVelocity = 10;
         this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityX));
         this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityY));
         
-        // Reduced damping for better momentum
-        this.velocityX *= 0.998;
-        this.velocityY *= 0.998;
+        // Very little damping for fast-paced action
+        this.velocityX *= 0.999;
+        this.velocityY *= 0.999;
         
         // Apply spin effect to horizontal movement
         this.velocityX += this.spin * 0.1;
@@ -208,8 +275,8 @@ class Ball {
                 powerMultiplier += 0.25;
             }
             
-            // Calculate base force with all multipliers
-            const baseForce = 3.0 * powerMultiplier;
+            // Calculate base force with all multipliers (increased for harder gameplay)
+            const baseForce = 3.5 * powerMultiplier;
             
             if (isSpike) {
                 // Spike: Strong downward and directional force
@@ -505,6 +572,8 @@ class Game {
         if (this.isOnline && this.isHost) {
             this.player1.update();
             this.player2.update();
+            this.player1.updateEyes(this.ball.x, this.ball.y);
+            this.player2.updateEyes(this.ball.x, this.ball.y);
             this.ball.update();
             this.ball.checkSlimeCollision(this.player1);
             this.ball.checkSlimeCollision(this.player2);
@@ -551,6 +620,8 @@ class Game {
         } else {
             this.player1.update();
             this.player2.update();
+            this.player1.updateEyes(this.ball.x, this.ball.y);
+            this.player2.updateEyes(this.ball.x, this.ball.y);
             this.ball.update();
             this.ball.checkSlimeCollision(this.player1);
             this.ball.checkSlimeCollision(this.player2);
