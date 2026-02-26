@@ -5,7 +5,7 @@ canvas.width = 800;
 canvas.height = 400;
 
 const GRAVITY = 0.25;
-const BALL_GRAVITY = 0.016;
+const BALL_GRAVITY = 0.025;
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
@@ -114,6 +114,7 @@ class Ball {
         this.velocityX = 0; // No initial horizontal movement
         this.velocityY = 0;
         this.color = '#FFD700';
+        this.spin = 0; // Ball spin for curve shots
         
         console.log(`Ball reset: starting on ${side} side at x=${this.x}, canvas.width=${canvas.width}`);
     }
@@ -121,29 +122,35 @@ class Ball {
     update() {
         this.velocityY += BALL_GRAVITY;
         
-        // Higher velocity cap for powerful shots
-        const maxVelocity = 4;
+        // Higher velocity cap for dynamic gameplay
+        const maxVelocity = 8;
         this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityX));
         this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityY));
         
-        // Apply strong damping
-        this.velocityX *= 0.995;
-        this.velocityY *= 0.995;
+        // Reduced damping for better momentum
+        this.velocityX *= 0.998;
+        this.velocityY *= 0.998;
+        
+        // Apply spin effect to horizontal movement
+        this.velocityX += this.spin * 0.1;
         
         this.x += this.velocityX;
         this.y += this.velocityY;
         
+        // Decay spin over time
+        this.spin *= 0.99;
+        
         if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
-            this.velocityX = -this.velocityX * 0.8; // More bouncy walls
+            this.velocityX = -this.velocityX * 0.85; // Wall bounce
             this.x = this.x - this.radius < 0 ? this.radius : canvas.width - this.radius;
         }
         
         if (this.y + this.radius > GROUND_Y) {
-            this.velocityY = -this.velocityY * 0.7; // Much more bouncy ground
+            this.velocityY = -this.velocityY * 0.75; // Ground bounce
             this.y = GROUND_Y - this.radius;
-            this.velocityX *= 0.9; // Less friction on ground
+            this.velocityX *= 0.92; // Ground friction
             
-            if (Math.abs(this.velocityY) < 0.05) { // Lower threshold for stopping
+            if (Math.abs(this.velocityY) < 0.08) {
                 this.velocityY = 0;
             }
         }
@@ -167,27 +174,81 @@ class Ball {
         
         if (distance < this.radius + slime.radius) {
             const angle = Math.atan2(dy, dx);
-            const targetX = slime.x + Math.cos(angle) * (this.radius + slime.radius);
-            const targetY = slime.y + slime.radius + Math.sin(angle) * (this.radius + slime.radius);
+            const slimeSpeed = Math.sqrt(slime.velocityX * slime.velocityX + slime.velocityY * slime.velocityY);
             
-            const ax = targetX - this.x;
-            const ay = targetY - this.y;
+            // Determine collision type and calculate power multipliers
+            let powerMultiplier = 1.0;
+            let directionBonus = 0;
             
-            // EXTREMELY powerful collision for proper gameplay
-            const baseForce = 2.5; // Much stronger base force
-            this.velocityX = Math.cos(angle) * baseForce;
-            this.velocityY = Math.sin(angle) * baseForce - 0.8; // Strong upward component
-            
-            // Major slime velocity influence
-            if (Math.abs(slime.velocityX) > 0.3) {
-                this.velocityX += slime.velocityX * 0.6; // Much stronger influence
+            // TIMING-BASED POWER: Reward precise timing
+            if (slime.velocityY < -2) { // Hitting while jumping up
+                powerMultiplier += 0.5; // 50% more power
             }
-            if (slime.velocityY < -0.3) {
-                this.velocityY += slime.velocityY * 0.6; // Strong upward boost when jumping
+            if (slimeSpeed > 1.5) { // Moving fast
+                powerMultiplier += 0.3; // 30% more power
+            }
+            if (!slime.onGround) { // Aerial hit
+                powerMultiplier += 0.2; // 20% more power
             }
             
-            this.x += this.velocityX;
-            this.y += this.velocityY;
+            // DIRECTIONAL CONTROL: Hit angle based on contact point
+            const contactAngle = Math.atan2(dy, dx);
+            const slimeDirection = Math.atan2(slime.velocityY, slime.velocityX);
+            
+            // SPIKE ATTACKS: Downward shots when hitting from above
+            let isSpike = false;
+            if (dy < -5 && slime.velocityY > 0 && !slime.onGround) {
+                isSpike = true;
+                powerMultiplier += 0.8; // Massive spike power
+            }
+            
+            // SWEET SPOT MECHANICS: Extra power for perfect positioning
+            const relativeX = dx / slime.radius; // -1 to 1
+            if (Math.abs(relativeX) < 0.3) { // Center sweet spot
+                powerMultiplier += 0.25;
+            }
+            
+            // Calculate base force with all multipliers
+            const baseForce = 3.0 * powerMultiplier;
+            
+            if (isSpike) {
+                // Spike: Strong downward and directional force
+                this.velocityX = dx > 0 ? baseForce * 0.8 : -baseForce * 0.8;
+                this.velocityY = Math.abs(baseForce * 1.2); // Downward spike
+                this.spin = dx > 0 ? -2 : 2; // Topspin
+            } else {
+                // Normal hit: Direction based on contact angle and slime movement
+                let hitAngle = contactAngle;
+                
+                // Adjust hit angle based on slime movement direction
+                if (Math.abs(slime.velocityX) > 0.5) {
+                    const influence = Math.sign(slime.velocityX) * 0.3;
+                    hitAngle += influence;
+                }
+                
+                this.velocityX = Math.cos(hitAngle) * baseForce;
+                this.velocityY = Math.sin(hitAngle) * baseForce;
+                
+                // Add slime momentum transfer (enhanced)
+                this.velocityX += slime.velocityX * 0.8;
+                this.velocityY += slime.velocityY * 0.8;
+                
+                // Add spin based on hit location and slime movement
+                this.spin = (relativeX * 3) + (slime.velocityX * 0.2);
+            }
+            
+            // Separate ball from slime to prevent multiple collisions
+            const separation = this.radius + slime.radius + 2;
+            this.x = slime.x + Math.cos(contactAngle) * separation;
+            this.y = slime.y + slime.radius + Math.sin(contactAngle) * separation;
+            
+            // Cap the maximum velocity after all calculations
+            const maxVel = 8;
+            const currentSpeed = Math.sqrt(this.velocityX * this.velocityX + this.velocityY * this.velocityY);
+            if (currentSpeed > maxVel) {
+                this.velocityX = (this.velocityX / currentSpeed) * maxVel;
+                this.velocityY = (this.velocityY / currentSpeed) * maxVel;
+            }
         }
     }
     
@@ -206,6 +267,15 @@ class Ball {
         ctx.strokeStyle = '#FFA500';
         ctx.lineWidth = 2;
         ctx.stroke();
+        
+        // Visual spin indicator
+        if (Math.abs(this.spin) > 0.1) {
+            ctx.strokeStyle = this.spin > 0 ? '#FF6B6B' : '#4ECDC4';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius - 3, 0, Math.PI * Math.abs(this.spin) * 0.5);
+            ctx.stroke();
+        }
         
         ctx.restore();
     }
