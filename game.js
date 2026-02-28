@@ -4,8 +4,8 @@ const ctx = canvas.getContext('2d');
 canvas.width = 800;
 canvas.height = 400;
 
-const GRAVITY = 0.3;  // Faster falling for more intense gameplay
-const BALL_GRAVITY = 0.035;  // Much faster ball physics
+const GRAVITY = 0.25;  // Standard gravity
+const BALL_GRAVITY = 0.02;  // Balanced ball physics
 const GROUND_Y = canvas.height - 50;
 const NET_HEIGHT = 100;
 const NET_WIDTH = 10;
@@ -20,8 +20,8 @@ class Slime {
         this.color = color;
         this.velocityX = 0;
         this.velocityY = 0;
-        this.speed = 2.5;  // Increased speed for harder gameplay
-        this.jumpPower = 7;  // Higher jumps for more dynamic play
+        this.speed = 2.2;  // Slightly increased speed
+        this.jumpPower = 6.5;  // Slightly higher jumps
         this.onGround = true;
         this.controls = controls;
         this.keys = {};
@@ -189,17 +189,17 @@ class Ball {
     update() {
         this.velocityY += BALL_GRAVITY;
         
-        // Higher velocity cap for intense gameplay
-        const maxVelocity = 10;
+        // Reasonable velocity cap
+        const maxVelocity = 6;
         this.velocityX = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityX));
         this.velocityY = Math.max(-maxVelocity, Math.min(maxVelocity, this.velocityY));
         
-        // Very little damping for fast-paced action
-        this.velocityX *= 0.999;
-        this.velocityY *= 0.999;
+        // Slight damping for control
+        this.velocityX *= 0.997;
+        this.velocityY *= 0.997;
         
-        // Apply spin effect to horizontal movement
-        this.velocityX += this.spin * 0.1;
+        // Apply spin effect to horizontal movement (reduced)
+        this.velocityX += this.spin * 0.05;
         
         this.x += this.velocityX;
         this.y += this.velocityY;
@@ -247,15 +247,15 @@ class Ball {
             let powerMultiplier = 1.0;
             let directionBonus = 0;
             
-            // TIMING-BASED POWER: Reward precise timing
+            // TIMING-BASED POWER: Reward precise timing (reduced multipliers)
             if (slime.velocityY < -2) { // Hitting while jumping up
-                powerMultiplier += 0.5; // 50% more power
+                powerMultiplier += 0.25; // 25% more power
             }
             if (slimeSpeed > 1.5) { // Moving fast
-                powerMultiplier += 0.3; // 30% more power
+                powerMultiplier += 0.15; // 15% more power
             }
             if (!slime.onGround) { // Aerial hit
-                powerMultiplier += 0.2; // 20% more power
+                powerMultiplier += 0.1; // 10% more power
             }
             
             // DIRECTIONAL CONTROL: Hit angle based on contact point
@@ -266,17 +266,17 @@ class Ball {
             let isSpike = false;
             if (dy < -5 && slime.velocityY > 0 && !slime.onGround) {
                 isSpike = true;
-                powerMultiplier += 0.8; // Massive spike power
+                powerMultiplier += 0.4; // Spike power boost
             }
             
             // SWEET SPOT MECHANICS: Extra power for perfect positioning
             const relativeX = dx / slime.radius; // -1 to 1
             if (Math.abs(relativeX) < 0.3) { // Center sweet spot
-                powerMultiplier += 0.25;
+                powerMultiplier += 0.15;
             }
             
-            // Calculate base force with all multipliers (increased for harder gameplay)
-            const baseForce = 3.5 * powerMultiplier;
+            // Calculate base force with all multipliers
+            const baseForce = 2.5 * powerMultiplier;
             
             if (isSpike) {
                 // Spike: Strong downward and directional force
@@ -296,9 +296,9 @@ class Ball {
                 this.velocityX = Math.cos(hitAngle) * baseForce;
                 this.velocityY = Math.sin(hitAngle) * baseForce;
                 
-                // Add slime momentum transfer (enhanced)
-                this.velocityX += slime.velocityX * 0.8;
-                this.velocityY += slime.velocityY * 0.8;
+                // Add slime momentum transfer
+                this.velocityX += slime.velocityX * 0.5;
+                this.velocityY += slime.velocityY * 0.5;
                 
                 // Add spin based on hit location and slime movement
                 this.spin = (relativeX * 3) + (slime.velocityX * 0.2);
@@ -310,7 +310,7 @@ class Ball {
             this.y = slime.y + slime.radius + Math.sin(contactAngle) * separation;
             
             // Cap the maximum velocity after all calculations
-            const maxVel = 8;
+            const maxVel = 6;
             const currentSpeed = Math.sqrt(this.velocityX * this.velocityX + this.velocityY * this.velocityY);
             if (currentSpeed > maxVel) {
                 this.velocityX = (this.velocityX / currentSpeed) * maxVel;
