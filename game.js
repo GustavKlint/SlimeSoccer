@@ -354,9 +354,9 @@ class Game {
             left: 'a',
             right: 'd',
             jump: 'w',
-            left2: 'ArrowLeft',
-            right2: 'ArrowRight',
-            jump2: 'ArrowUp',
+            left2: null,
+            right2: null,
+            jump2: null,
             side: 'left'
         });
         
@@ -364,9 +364,9 @@ class Game {
             left: 'ArrowLeft',
             right: 'ArrowRight',
             jump: 'ArrowUp',
-            left2: 'a',
-            right2: 'd',
-            jump2: 'w',
+            left2: null,
+            right2: null,
+            jump2: null,
             side: 'right'
         });
         
